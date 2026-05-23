@@ -12,9 +12,11 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
     os.exit(1)
   end
 end
+
+-- Add the path to the lazy plugings repositories to the vim runtime path
 vim.opt.rtp:prepend(lazypath)
 
-require("lazy").setup({
+local opts = {
   spec = {
     -- 1. Core LayyVim plugings
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
@@ -55,4 +57,9 @@ require("lazy").setup({
       },
     },
   },
-})
+}
+
+-- Setup lazy, this should always be the last
+-- Tell lazy that all plugin specs are found in the plugins directory
+-- Pass it the options we specified above
+require("lazy").setup(opts)
