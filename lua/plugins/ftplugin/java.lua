@@ -35,24 +35,93 @@ local config = {
 
   settings = {
     java = {
-      signatureHelp = { enabled = true },
+      -- Enable method signature help
+      signatureHelp = {
+        enabled = true,
+      },
       extendedClientCapabilities = extendedClientCapabilities,
+      -- Enable downloading archives from maven automatically
       maven = {
         downloadSources = true,
       },
+      -- Enable downloading archves from eclipse automatically
+      eclipse = {
+        downloadSources = true,
+      },
+      -- Enable code lens in the lsp
       referencesCodeLens = {
         enabled = true,
       },
       references = {
         includeDecompiledSources = true,
       },
+      -- Enable inlay hints for parameter names
       inlayHints = {
         parameterNames = {
           enabled = "all", -- literals, all, none
         },
       },
+      -- Enable code formatting
       format = {
-        enabled = false,
+        enabled = true,
+        -- Use the Google Style guid for code formatting
+        settings = {
+          url = vim.fn.stdpath("config") .. "/lang_servers/intellij-java-google-style.xml",
+          profile = "GoogleStyle",
+        },
+      },
+      -- Use the fernflower decompiler when using the javap command to decompile byte code back to java code
+      contentProvider = {
+        preferred = "fernflower",
+      },
+      -- Setup automatical package import organization on file save
+      saveActions = {
+        organizeImports = true,
+      },
+      sources = {
+        -- How many classes from a specific package should be imported before automatic imports combine them all into a single import
+        organizeImports = {
+          starThreshold = 9999,
+          staticThreshold = 9999,
+        },
+      },
+      -- Customize completion options
+      completion = {
+        -- When using an unimported static method, how should the LSP rank possible places to import the static method from
+        favoriteStaticMembers = {
+          "org.hamcrest.MatcherAssert.assertThat",
+          "org.hamcrest.Matchers.*",
+          "org.hamcrest.CoreMatchers.*",
+          "org.junit.jupiter.api.Assertions.*",
+          "java.util.Objects.requireNonNull",
+          "java.util.Objects.requireNonNullElse",
+          "org.mockito.Mockito.*",
+        },
+        -- Try not to suggest imports from these packages in the code action window
+        filteredTypes = {
+          "com.sun.*",
+          "io.micrometer.shaded.*",
+          "java.awt.*",
+          "jdk.*",
+          "sun.*",
+        },
+        -- Set the order in which the language server should organize imports
+        importOrder = {
+          "java",
+          "jakarta",
+          "javax",
+          "com",
+          "org",
+        },
+      },
+      -- How should different pieces of code be generated?
+      codeGeneration = {
+        -- When generating toString use a json format
+        toString = {
+          template = "${object.className}{${member.name()}=${member.value}, ${otherMembers}}",
+        },
+        -- When generating code use code blocks
+        useBlocks = true,
       },
     },
   },
