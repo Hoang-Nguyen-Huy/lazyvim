@@ -132,14 +132,6 @@ local init_options = {
   extendedClientCapabilities = extendedClientCapabilities,
 }
 
-local config = {
-  cmd = cmd,
-  root_dir = require("jdtls.setup").find_root({ ".git", "mvnw", "gradlew", "pom.xml", "build.gradle" }),
-  settings = settings,
-  init_options = init_options,
-}
-require("jdtls").start_or_attach(config)
-
 local function java_keymaps()
   -- Allow yourself to run JdtCompile as a Vim command
   vim.cmd(
@@ -206,3 +198,47 @@ local function java_keymaps()
   -- Set a Vim motion to <Space> + <Shift>J + u to update the project configuration
   vim.keymap.set("n", "<leader>Ju", "<Cmd> JdtUpdateConfig<CR>", { desc = "[J]ava [U]pdate Config" })
 end
+
+-- Function that will be ran once the language server is attached
+local on_attach = function(_, bufnr)
+  -- Map the Java specific key mappings of the JDTLS server
+  java_keymaps()
+
+  -- Setup the java debug adapter of the JDTLS server
+  require("jdtls.dap").setup_dap()
+
+  -- Find the main method(s) of the application so the debug adapter can successfully start up the application
+  -- Sometimes this will randomly fail if language server takes to long to startup for the project, if a ClassDefNotFoundException occurs when running
+  -- the debug tool, attempt to run the debug tool while in the main class of the application, or restart the neovim instance
+  -- Unfortunately I have not found an elegant way to ensure this works 100%
+  require("jdtls.dap").setup_dap_main_class_configs()
+
+  -- Refresh the codelens
+  -- Code lens enables features such as code reference counts, implementation counts and more.
+  vim.lsp.codelens.enable(true)
+
+  -- Setup a function that automatically runs every time a java file is saved to refresh the code lens
+  vim.api.nvim_create_autocmd("BufWritePost", {
+    pattern = { "*.java" },
+    callback = function()
+      local _, _ = pcall(vim.lsp.codelens.enable, true)
+    end,
+  })
+end
+
+local function setup_jdtls()
+  -- Create the configuration table for the start or attach function
+  local config = {
+    cmd = cmd,
+    root_dir = require("jdtls.setup").find_root({ ".git", "mvnw", "gradlew", "pom.xml", "build.gradle" }),
+    settings = settings,
+    init_options = init_options,
+    on_attach = on_attach,
+  }
+  -- Start the JDTLS server
+  require("jdtls").start_or_attach(config)
+end
+
+return {
+  setup_jdtls = setup_jdtls,
+}
