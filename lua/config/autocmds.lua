@@ -1,12 +1,3 @@
--- Autocmds are automatically loaded on the VeryLazy event
--- Default autocmds that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/autocmds.lua
---
--- Add any additional autocmds here
--- with `vim.api.nvim_create_autocmd`
---
--- Or remove existing autocmds by their group name (which is prefixed with `lazyvim_` for the defaults)
--- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
-
 -- Setup our JDTLS server any time we open up a java file
 vim.cmd([[
     augroup jdtls_lsp
@@ -14,3 +5,13 @@ vim.cmd([[
         autocmd FileType java lua require'config.jdtls'.setup_jdtls()
     augroup end
 ]])
+
+-- The event data property will contain a string with either "default" or "light" respectively
+vim.api.nvim_create_autocmd("User", {
+  pattern = "CyberdreamToggleMode",
+  callback = function(event)
+    -- Your custom code here!
+    -- For example, notify the user that the colorscheme has been toggled
+    print("Switched to " .. event.data .. " mode!")
+  end,
+})
