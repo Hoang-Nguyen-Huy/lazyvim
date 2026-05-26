@@ -6,7 +6,7 @@ return {
     require("cyberdream").setup({
       -- Ref: https://github.com/scottmckendry/cyberdream.nvim
       -- Set light or dark variant
-      variant = "default", -- use "light" for the light variant. Also accepts "auto" to set dark or light colors based on the current value of `vim.o.background`
+      variant = "auto", -- use "light" for the light variant. Also accepts "auto" to set dark or light colors based on the current value of `vim.o.background`
 
       -- Enable transparent background
       transparent = true,
